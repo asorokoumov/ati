@@ -5,6 +5,59 @@
     <title>Title</title>
 </head>
 <body>
-OK
+Процессов запущено: {{ process_count }}<br/><br/>
+<b>Активные процессы</b><br/>
+<br/>
+
+<table border="1">
+    <tr>
+    <th>Номер парсера</th>
+    <th>Старт</th>
+    <th>Комбинаций регионов готово</th>
+    <th>Комбинаций регионов осталось</th>
+    <th>Спарсили заказов</th>
+    <th>Добавили новых заказов</th>
+   </tr>
+
+{% for parser in parsers %}
+    <tr>
+        <td>{{parser.id}}</td>
+        <td >{{parser.started}}</td>
+        <td id="combinations_done">{{parser.combinations_done}}</td>
+        <td id="combinations_left">{{parser.combinations_left}}</td>
+        <td id="parsed_total">{{parser.parsed_total}}</td>
+        <td id="created_total">{{parser.created_total}}</td>
+    </tr>
+{% endfor %}
+        </table>
 </body>
 </html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+    window.onload = function () {
+
+    setInterval(function() {
+        $.ajax({
+            type: "GET",
+            url: "{% url 'parse:update_result' %}",
+        })
+        .done(function(response) {
+
+        var e = document.getElementById("combinations_done");
+        e.innerHTML=response[0].fields.combinations_done;
+
+        var e = document.getElementById("combinations_left");
+        e.innerHTML=response[0].fields.combinations_left;
+
+        var e = document.getElementById("parsed_total");
+        e.innerHTML=response[0].fields.parsed_total;
+
+        var e = document.getElementById("created_total");
+        e.innerHTML=response[0].fields.created_total;
+
+
+        });
+    }, 500)};
+</script>

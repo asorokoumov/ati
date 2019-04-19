@@ -1,17 +1,46 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import requests
-import json
+
 import math
 
-from django.shortcuts import render
-from parse.models import Loads
+from django.shortcuts import render, redirect
+from parse.models import Loads, Parser
+
+import requests
+import json
+import datetime
+from django.http import HttpResponse
+import json
+from django.core import serializers
+
+
+
+def update_result(request):
+
+    parsers = Parser.objects.filter(is_finished=False).first()
+
+    data = serializers.serialize('json', [parsers])
+    print data
+    return HttpResponse(data, content_type="application/json")
+
 
 # Create your views here.
-def index (request):
-    import requests
-    import json
+def index(request):
+    process_count = Parser.objects.filter(is_finished=False).count()
+    if process_count == 0:
+        parser = Parser(is_finished=False, parsed_total=0, created_total=0)
+        parser.save()
+        parse_ati(parser=parser)
+        return redirect('index')
 
+    else:
+        parsers = Parser.objects.filter(is_finished=False)
+        print parsers
+        return render(request, 'parse/index.html', {'parsers': parsers, 'process_count': process_count})
+
+
+def parse_ati(parser):
+    print 'started'
     regions = ['6f5e4ef8-e210-e311-b4ec-00259038ec34',
                'ee634ef8-e210-e311-b4ec-00259038ec34',
                '79644ef8-e210-e311-b4ec-00259038ec34',
@@ -23,34 +52,39 @@ def index (request):
                'be654ef8-e210-e311-b4ec-00259038ec34',
                ]
     region_count = 0
+    region_combinations_total = len(regions) * len(regions)
+    parser.combinations_done = region_count
+    parser.combinations_left = region_combinations_total - region_count
+    parser.save()
     for region_from in regions:
         for region_to in regions:
             region_count = region_count + 1
             print 'REGION_COUNTER ' + str(region_count)
-            headers = {'content-type': 'application/json', 'cookie': 'last_read_updates=0; _ga=GA1.2.2022737109.1548760403; _ym_uid=1548760404598233320; _ym_d=1548760404; efid=VQX%2540WJE; ASP.NET_SessionId=x0gb40ls02m5lt5kem2ckmep; itemsPerPage=10; ami=1; last_visit=1554808030385::1554818830385; AtiGeo=3611_151_1_1; did=OrewgpxwPtZPpsAUN15KKpM%2BjEDjbfyUOwtGaMzOBUk%3D; sid=169a7993d6f34a7cab68a6e28ab2a79f; last_visit=1554809275946::1554820075946'}
-
+            headers = {'content-type': 'application/json',
+                       'cookie': 'last_read_updates=0; _ga=GA1.2.2022737109.1548760403; _ym_uid=1548760404598233320; _ym_d=1548760404; efid=VQX%2540WJE; ASP.NET_SessionId=x0gb40ls02m5lt5kem2ckmep; itemsPerPage=10; ami=1; last_visit=1554808030385::1554818830385; AtiGeo=3611_151_1_1; did=OrewgpxwPtZPpsAUN15KKpM%2BjEDjbfyUOwtGaMzOBUk%3D; sid=169a7993d6f34a7cab68a6e28ab2a79f; last_visit=1554809275946::1554820075946'}
 
             url = 'https://loads.ati.su/webapi/v1.0/loads/search'
-            data_from_chrome = '{"page":1,"items_per_page":10,"filter":{"from":{"type":5,"list_id":"'+region_from+'","list_type":2,"exact_only":true,"radius":0},' \
-                               '"to":{"type":5,"list_id":"'+region_to+'","list_type":2,"exact_only":true,"radius":0},"dates":{"date_option":"today-plus","date_from":"2019-01-01",' \
-                               '"date_to":null},"truck_type":0,"loading_type":0,"extra_params":0,"dogruz":null,' \
-                               '"sorting_type":2,"change_date":0,"show_hidden_loads":false,"board_list":[],' \
-                               '"with_dimensions":false},"exclude_geo_dicts":true} '
+            data_from_chrome = '{"page":1,"items_per_page":10,"filter":{"from":{"type":5,"list_id":"' + region_from + '","list_type":2,"exact_only":true,"radius":0},' \
+                                                                                                                      '"to":{"type":5,"list_id":"' + region_to + '","list_type":2,"exact_only":true,"radius":0},"dates":{"date_option":"today-plus","date_from":"2019-01-01",' \
+                                                                                                                                                                 '"date_to":null},"truck_type":0,"loading_type":0,"extra_params":0,"dogruz":null,' \
+                                                                                                                                                                 '"sorting_type":2,"change_date":0,"show_hidden_loads":false,"board_list":[],' \
+                                                                                                                                                                 '"with_dimensions":false},"exclude_geo_dicts":true} '
             data = json.loads(data_from_chrome)
             response = requests.post(url, data=json.dumps(data), headers=headers)
             try:
                 result = json.loads(response.content)
                 total_items = result['totalItems']
-                pages_total = int(math.ceil(total_items/10))
+                pages_total = int(math.ceil(total_items / 10))
 
                 print pages_total
 
                 for page_number in range(pages_total):
-                    data_from_chrome = '{"page":' + str(page_number) +',"items_per_page":10,"filter":{"from":{"type":5,"list_id":"'+region_from+'","list_type":2,"exact_only":true,"radius":0},' \
-                               '"to":{"type":5,"list_id":"'+region_to+'","list_type":2,"exact_only":true,"radius":0},"dates":{"date_option":"today-plus","date_from":"2019-01-01",' \
-                               '"date_to":null},"truck_type":0,"loading_type":0,"extra_params":0,"dogruz":null,' \
-                               '"sorting_type":2,"change_date":0,"show_hidden_loads":false,"board_list":[],' \
-                               '"with_dimensions":false},"exclude_geo_dicts":true} '
+                    data_from_chrome = '{"page":' + str(
+                        page_number) + ',"items_per_page":10,"filter":{"from":{"type":5,"list_id":"' + region_from + '","list_type":2,"exact_only":true,"radius":0},' \
+                                                                                                                     '"to":{"type":5,"list_id":"' + region_to + '","list_type":2,"exact_only":true,"radius":0},"dates":{"date_option":"today-plus","date_from":"2019-01-01",' \
+                                                                                                                                                                '"date_to":null},"truck_type":0,"loading_type":0,"extra_params":0,"dogruz":null,' \
+                                                                                                                                                                '"sorting_type":2,"change_date":0,"show_hidden_loads":false,"board_list":[],' \
+                                                                                                                                                                '"with_dimensions":false},"exclude_geo_dicts":true} '
                     data = json.loads(data_from_chrome)
                     response = requests.post(url, data=json.dumps(data), headers=headers)
                     result = json.loads(response.content)
@@ -98,6 +132,10 @@ def index (request):
                         except KeyError:
                             firm_contacts = ''
 
+                        if Loads.objects.filter(ati_id=ati_id).count() == 0:
+                            parser.created_total = parser.created_total + 1
+                            parser.save()
+
                         obj, created = Loads.objects.get_or_create(
                             ati_id=ati_id,
                             defaults={
@@ -121,12 +159,21 @@ def index (request):
                                 'firm_profile': firm_profile,
                                 'firm_city': firm_city,
                                 'firm_contacts': firm_contacts,
+                                'full_info': load,
+                                'parser': parser
                             },
 
                         )
+                        parser.parsed_total = parser.parsed_total+1
+                        parser.save()
+                parser.combinations_done = region_count
+                parser.combinations_left = region_combinations_total - region_count
+                parser.save()
 
             except ValueError as e:
                 print response.content
                 print(e)
 
-    return render(request, 'parse/index.html')
+    parser.is_finished = True
+    parser.finished = datetime.datetime.now()
+    parser.save()

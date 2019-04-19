@@ -4,6 +4,20 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.timezone import now
 
+
+
+
+
+class Parser (models.Model):
+    is_finished = models.BooleanField (default=False)
+    started = models.DateTimeField(default=now)
+    finished =models.FloatField(default=None, blank=True, null=True)
+    combinations_done =models.FloatField(default=None, blank=True, null=True)
+    combinations_left =models.FloatField(default=None, blank=True, null=True)
+    parsed_total = models.FloatField(default=None, blank=True, null=True)
+    created_total = models.FloatField(default=None, blank=True, null=True)
+
+
 # Create your models here.
 class Loads(models.Model):
     ati_id = models.TextField(default=None, blank=True, null=True)
@@ -28,6 +42,8 @@ class Loads(models.Model):
     firm_city = models.TextField(default=None, blank=True, null=True)
     firm_contacts = models.TextField(default=None, blank=True, null=True)
     last_found = models.DateTimeField(default=now)
+    full_info = models.TextField(default=None, blank=True, null=True)
+    parser = models.ForeignKey(Parser)
 
     def __str__(self):
         return self.ati_id

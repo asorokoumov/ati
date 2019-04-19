@@ -22,4 +22,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^update_result$', views.update_result, name='update_result'),
 ]
