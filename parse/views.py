@@ -134,13 +134,9 @@ def parse_ati(parser):
                             firm_city = ''
 
                         try:
-                            firm_contacts = load['firm']['contacts']
+                            firm_contacts = repr(load['firm']['contacts']).decode("unicode_escape")
                         except KeyError:
                             firm_contacts = ''
-
-                        if Loads.objects.filter(ati_id=ati_id).count() == 0:
-                            parser.created_total = parser.created_total + 1
-                            parser.save()
 
                         obj, created = Loads.objects.get_or_create(
                             ati_id=ati_id,
@@ -166,11 +162,40 @@ def parse_ati(parser):
                                 'firm_profile': firm_profile,
                                 'firm_city': firm_city,
                                 'firm_contacts': firm_contacts,
-                                'full_info': load,
+                                'full_info': repr(load).decode("unicode_escape"),
                                 'parser': parser
                             },
 
                         )
+                        if created:
+                            parser.created_total = parser.created_total + 1
+                            parser.save()
+
+                        else:
+                            obj.route_distance = route_distance
+                            obj.truck_loading_types = truck_loading_types
+                            obj.truck_unloading_types = truck_unloading_types
+                            obj.truck_car_types = truck_car_types
+                            obj.load_cargo_type = load_cargo_type
+                            obj.load_weight = load_weight
+                            obj.load_volume = load_volume
+                            obj.loading_city = loading_city
+                            obj.loading_region = loading_region
+                            obj.unloading_city = unloading_city
+                            obj.unloading_region = unloading_region
+                            obj.rate_price_nds = rate_price_nds
+                            obj.rate_price_nonds = rate_price_nonds
+                            obj.rate_currency = rate_currency
+                            obj.firm_id = firm_id
+                            obj.firm_name = firm_name
+                            obj.firm_fullname = firm_fullname
+                            obj.firm_profile = firm_profile
+                            obj.firm_city = firm_city
+                            obj.firm_contacts = firm_contacts
+                            obj.full_info = repr(load).decode("unicode_escape")
+                            obj.parser = parser
+                            obj.save()
+
                         parser.parsed_total = parser.parsed_total+1
                         parser.save()
                 parser.combinations_done = region_count
