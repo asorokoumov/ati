@@ -113,6 +113,12 @@ def parse_ati(parser):
                             firm_name = ''
 
                         try:
+                            firm_id = load['firm']['id']
+                        except KeyError:
+                            firm_id = ''
+
+
+                        try:
                             firm_fullname = load['firm']['firmFullName']
                         except KeyError:
                             firm_fullname = ''
@@ -154,6 +160,7 @@ def parse_ati(parser):
                                 'rate_price_nds': rate_price_nds,
                                 'rate_price_nonds': rate_price_nonds,
                                 'rate_currency': rate_currency,
+                                'firm_id': firm_id,
                                 'firm_name': firm_name,
                                 'firm_fullname': firm_fullname,
                                 'firm_profile': firm_profile,

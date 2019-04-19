@@ -37,6 +37,7 @@ class Loads(models.Model):
     rate_price_nonds = models.TextField(default=None, blank=True, null=True)
     rate_currency = models.TextField(default=None, blank=True, null=True)
     firm_name = models.TextField(default=None, blank=True, null=True)
+    firm_id = models.TextField(default=None, blank=True, null=True)
     firm_fullname = models.TextField(default=None, blank=True, null=True)
     firm_profile = models.TextField(default=None, blank=True, null=True)
     firm_city = models.TextField(default=None, blank=True, null=True)
