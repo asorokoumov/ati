@@ -44,7 +44,7 @@ class Loads(models.Model):
     firm_contacts = models.TextField(default=None, blank=True, null=True)
     last_found = models.DateTimeField(default=now)
     full_info = models.TextField(default=None, blank=True, null=True)
-    parser = models.ForeignKey(Parser)
+    parser = models.ForeignKey(Parser, default=None, blank=True, null=True)
 
     def __str__(self):
         return self.ati_id
