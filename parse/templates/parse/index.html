@@ -2,38 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <title>Title</title>
 </head>
 <body>
 Процессов запущено: {{ process_count }}<br/><br/>
-<b>Активные процессы</b><br/>
-<br/>
 
-<table border="1">
-    <tr>
-    <th>Номер парсера</th>
-    <th>Старт</th>
-    <th>Комбинаций регионов готово</th>
-    <th>Комбинаций регионов осталось</th>
-    <th>Спарсили заказов</th>
-    <th>Добавили новых заказов</th>
-   </tr>
+{% if process_count > 0 %}
 
-{% for parser in parsers %}
-    <tr>
-        <td>{{parser.id}}</td>
-        <td >{{parser.started}}</td>
-        <td id="combinations_done">{{parser.combinations_done}}</td>
-        <td id="combinations_left">{{parser.combinations_left}}</td>
-        <td id="parsed_total">{{parser.parsed_total}}</td>
-        <td id="created_total">{{parser.created_total}}</td>
-    </tr>
-{% endfor %}
-        </table>
+    <b>Активные процессы</b><br/>
+    <br/>
+
+    <table border="1">
+        <tr>
+        <th>Номер парсера</th>
+        <th>Старт</th>
+        <th>Комбинаций регионов готово</th>
+        <th>Комбинаций регионов осталось</th>
+        <th>Спарсили заказов</th>
+        <th>Добавили новых заказов</th>
+       </tr>
+
+    {% for parser in parsers %}
+        <tr>
+            <td>{{parser.id}}</td>
+            <td >{{parser.started}}</td>
+            <td id="combinations_done">{{parser.combinations_done}}</td>
+            <td id="combinations_left">{{parser.combinations_left}}</td>
+            <td id="parsed_total">{{parser.parsed_total}}</td>
+            <td id="created_total">{{parser.created_total}}</td>
+        </tr>
+    {% endfor %}
+            </table>
+<button type="button" class="btn btn-danger" href="#" onclick="
+    location.href = '{% url 'parse:stop' %}';">Остановить</button>
+
+{% else %}
+<button type="button" class="btn btn-success" href="#" onclick="
+    location.href = '{% url 'parse:run' %}';window.open('{% url 'parse:index' %}');
+">Запустить</button>
+
+{% endif %}
 </body>
 </html>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+
+{% if process_count > 0 %}
 
 <script>
     window.onload = function () {
@@ -61,3 +81,4 @@
         });
     }, 500)};
 </script>
+{% endif %}

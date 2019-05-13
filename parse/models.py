@@ -49,3 +49,5 @@ class Loads(models.Model):
     def __str__(self):
         return self.ati_id
 
+class Stopper (models.Model):
+    is_stopped = models.BooleanField (default=False)

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import math
 
 from django.shortcuts import render, redirect
-from parse.models import Loads, Parser
+from parse.models import Loads, Parser, Stopper
 
 import requests
 import json
@@ -12,6 +12,8 @@ import datetime
 from django.http import HttpResponse
 import json
 from django.core import serializers
+import time
+
 
 
 
@@ -27,16 +29,41 @@ def update_result(request):
 # Create your views here.
 def index(request):
     process_count = Parser.objects.filter(is_finished=False).count()
+    parsers = Parser.objects.filter(is_finished=False)
+    return render(request, 'parse/index.html', {'parsers': parsers, 'process_count': process_count})
+
+
+def run(request):
+    process_count = Parser.objects.filter(is_finished=False).count()
     if process_count == 0:
+        stopper = Stopper.objects.all().first()
+        stopper.is_stopped = False
+        stopper.save()
+
         parser = Parser(is_finished=False, parsed_total=0, created_total=0)
         parser.save()
-        parse_ati(parser=parser)
-        return redirect('index')
+        parse_ati(parser)
+        return redirect('parse:index')
 
     else:
         parsers = Parser.objects.filter(is_finished=False)
         print parsers
         return render(request, 'parse/index.html', {'parsers': parsers, 'process_count': process_count})
+
+
+# Create your views here.
+def stop(request):
+    stopper = Stopper.objects.all().first()
+    stopper.is_stopped = True
+    stopper.save()
+
+    parsers = Parser.objects.all()
+    for parser in parsers:
+        parser.is_finished = True
+        parser.save()
+    process_count = Parser.objects.filter(is_finished=False).count()
+
+    return redirect('parse:index')
 
 
 def parse_ati(parser):
@@ -99,6 +126,9 @@ def parse_ati(parser):
                     loads = result['loads']
                     print 'PAGE ---- ' + str(page_number)
                     for load in loads:
+                        if Stopper.objects.all().first().is_stopped is True:
+                            return None
+
                         ati_id = load['id']
                         add_date = load['addDate']
                         route_distance = load['route']['distance']
