@@ -60,14 +60,22 @@ def parse_ati(parser):
         for region_to in regions:
             region_count = region_count + 1
             print 'REGION_COUNTER ' + str(region_count)
-            headers = {'content-type': 'application/json',
-                       'cookie': 'last_read_updates=0; _ga=GA1.2.2022737109.1548760403; _ym_uid=1548760404598233320; _ym_d=1548760404; efid=VQX%2540WJE; ASP.NET_SessionId=x0gb40ls02m5lt5kem2ckmep; itemsPerPage=10; ami=1; last_visit=1554808030385::1554818830385; AtiGeo=3611_151_1_1; did=OrewgpxwPtZPpsAUN15KKpM%2BjEDjbfyUOwtGaMzOBUk%3D; sid=169a7993d6f34a7cab68a6e28ab2a79f; last_visit=1554809275946::1554820075946'}
-
+            headers = {
+                'origin': 'https://loads.ati.su',
+                'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6,zh;q=0.5',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+                'content-type': 'application/json;charset=UTF-8',
+                'accept': 'application/json',
+                'referer': 'https://loads.ati.su/',
+                'authority': 'loads.ati.su',
+                'cookie': 'last_read_updates=0; _ga=GA1.2.2022737109.1548760403; _ym_uid=1548760404598233320; _ym_d=1548760404; efid=VQX%2540WJE; ASP.NET_SessionId=x0gb40ls02m5lt5kem2ckmep; itemsPerPage=10; ami=1; atisuReferrer=utm_source=AJIEIIIKA11; did=OrewgpxwPtZPpsAUN15KKpM%2BjEDjbfyUOwtGaMzOBUk%3D; sid=10c09ab4cd8a4e1288c7de2afa787e93; AtiGeo=3611_151_1_1; last_visit=1557745126648::1557755926648; last_visit=1557745150005::1557755950005',
+            }
             url = 'https://loads.ati.su/webapi/v1.0/loads/search'
             data_from_chrome = '{"page":1,"items_per_page":10,"filter":{"from":{"type":5,"list_id":"' + region_from + '","list_type":2,"exact_only":true,"radius":0},' \
-                                                                                                                      '"to":{"type":5,"list_id":"' + region_to + '","list_type":2,"exact_only":true,"radius":0},"dates":{"date_option":"today-plus","date_from":"2019-01-01",' \
+                                                                                                                      '"to":{"type":5,"list_id":"' + region_to + '","list_type":2,"exact_only":true,"radius":0},"dates":{"date_option":"manual","date_from":"'+datetime.datetime.now().date().strftime ("%Y-%m-%d")+'",' \
                                                                                                                                                                  '"date_to":null},"truck_type":0,"loading_type":0,"extra_params":0,"dogruz":null,' \
-                                                                                                                                                                 '"sorting_type":2,"change_date":0,"show_hidden_loads":false,"board_list":[],' \
+                                                                                                                                                                 '"sorting_type":2,"change_date":3,"show_hidden_loads":false,"board_list":[],' \
                                                                                                                                                                  '"with_dimensions":false},"exclude_geo_dicts":true} '
             data = json.loads(data_from_chrome)
             response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -81,9 +89,9 @@ def parse_ati(parser):
                 for page_number in range(pages_total):
                     data_from_chrome = '{"page":' + str(
                         page_number) + ',"items_per_page":10,"filter":{"from":{"type":5,"list_id":"' + region_from + '","list_type":2,"exact_only":true,"radius":0},' \
-                                                                                                                     '"to":{"type":5,"list_id":"' + region_to + '","list_type":2,"exact_only":true,"radius":0},"dates":{"date_option":"today-plus","date_from":"2019-01-01",' \
+                                                                                                                     '"to":{"type":5,"list_id":"' + region_to + '","list_type":2,"exact_only":true,"radius":0},"dates":{"date_option":"manual","date_from":"'+datetime.datetime.now().date().strftime ("%Y-%m-%d")+'",' \
                                                                                                                                                                 '"date_to":null},"truck_type":0,"loading_type":0,"extra_params":0,"dogruz":null,' \
-                                                                                                                                                                '"sorting_type":2,"change_date":0,"show_hidden_loads":false,"board_list":[],' \
+                                                                                                                                                                '"sorting_type":2,"change_date":3,"show_hidden_loads":false,"board_list":[],' \
                                                                                                                                                                 '"with_dimensions":false},"exclude_geo_dicts":true} '
                     data = json.loads(data_from_chrome)
                     response = requests.post(url, data=json.dumps(data), headers=headers)
