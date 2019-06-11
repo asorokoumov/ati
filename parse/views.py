@@ -96,7 +96,7 @@ def parse_ati(parser):
                 'accept': 'application/json',
                 'referer': 'https://loads.ati.su/',
                 'authority': 'loads.ati.su',
-                'cookie': 'last_read_updates=0; _ga=GA1.2.2022737109.1548760403; _ym_uid=1548760404598233320; _ym_d=1548760404; efid=VQX%2540WJE; ASP.NET_SessionId=x0gb40ls02m5lt5kem2ckmep; itemsPerPage=10; ami=1; atisuReferrer=utm_source=AJIEIIIKA11; did=OrewgpxwPtZPpsAUN15KKpM%2BjEDjbfyUOwtGaMzOBUk%3D; sid=10c09ab4cd8a4e1288c7de2afa787e93; AtiGeo=3611_151_1_1; last_visit=1557745126648::1557755926648; last_visit=1557745150005::1557755950005',
+                'cookie': 'last_read_updates=0; _ga=GA1.2.2022737109.1548760403; _ym_uid=1548760404598233320; _ym_d=1548760404; efid=VQX%2540WJE; ASP.NET_SessionId=x0gb40ls02m5lt5kem2ckmep; itemsPerPage=10; ami=1; atisuReferrer=utm_source=AJIEIIIKA11; did=OrewgpxwPtZPpsAUN15KKpM%2BjEDjbfyUOwtGaMzOBUk%3D; sid=7fcfd653bc2f446ebf18c5b118c77e66; last_visit=1560242490156::1560253290156; last_visit=1560243745005::1560254545005; AtiGeo=3611_151_1_1',
             }
             url = 'https://loads.ati.su/webapi/v1.0/loads/search'
             data_from_chrome = '{"page":1,"items_per_page":10,"filter":{"from":{"type":5,"list_id":"' + region_from + '","list_type":2,"exact_only":true,"radius":0},' \
